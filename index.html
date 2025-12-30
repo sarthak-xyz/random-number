@@ -3,192 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Punjabi Tambola Fun</title>
+    <title>Rhyming Punjabi Tambola</title>
     <style>
-        :root {
-            --primary: #d32f2f;
-            --secondary: #ffc107;
-            --bg: #fff9e6;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 0;
-            padding: 20px;
-        }
-        h1 { color: var(--primary); text-shadow: 1px 1px 2px #ccc; }
+        :root { --primary: #ff0054; --secondary: #9ef01a; --dark: #222; }
+        body { font-family: 'Arial Black', sans-serif; background-color: var(--dark); color: white; text-align: center; padding: 10px; margin: 0; overflow-x: hidden; }
         
-        #current-container {
-            background: white;
-            border: 5px solid var(--secondary);
-            border-radius: 20px;
-            padding: 30px;
-            text-align: center;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            width: 90%;
-            max-width: 500px;
-        }
-        #number-display {
-            font-size: 80px;
-            font-weight: bold;
-            color: var(--primary);
-            margin: 0;
-        }
-        #punjabi-text {
-            font-size: 24px;
-            color: #555;
-            font-style: italic;
-            min-height: 1.5em;
-        }
-
-        .controls { margin-bottom: 20px; }
-        button {
-            padding: 15px 30px;
-            font-size: 18px;
-            cursor: pointer;
-            border: none;
-            border-radius: 10px;
-            background: var(--primary);
-            color: white;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-        button:hover { background: #b71c1c; transform: scale(1.05); }
-        button:disabled { background: #ccc; cursor: not-allowed; }
-
-        #board {
-            display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            gap: 5px;
-            max-width: 600px;
-            background: white;
-            padding: 10px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-        .cell {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-            color: #aaa;
-        }
-        .cell.called {
-            background-color: var(--secondary);
-            color: black;
-            font-weight: bold;
-            border-color: var(--secondary);
-        }
+        .header { background: linear-gradient(45deg, #ff0054, #ffb703); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 28px; margin: 10px 0; }
         
-        #last-called {
-            margin-top: 15px;
-            font-size: 14px;
-            color: #666;
-        }
+        #display-box { background: #333; border: 6px dashed var(--secondary); border-radius: 30px; padding: 25px; margin: 15px auto; width: 85%; max-width: 400px; box-shadow: 0 0 20px rgba(158, 240, 26, 0.3); }
+        #num { font-size: 110px; color: var(--secondary); display: block; line-height: 1; }
+        #rhyme { font-size: 22px; color: white; margin-top: 10px; min-height: 60px; font-weight: normal; font-family: 'Segoe UI', sans-serif; }
+
+        .controls { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        button { padding: 15px 25px; font-size: 18px; border-radius: 50px; border: none; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .next-btn { background: var(--secondary); color: black; box-shadow: 0 5px 0 #76b00f; }
+        .next-btn:active { transform: translateY(3px); box-shadow: none; }
+        
+        #grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; max-width: 450px; margin: 0 auto; background: #111; padding: 10px; border-radius: 10px; }
+        .cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; background: #444; border-radius: 4px; color: #888; }
+        .cell.active { background: var(--primary); color: white; font-weight: bold; box-shadow: 0 0 8px var(--primary); }
+
+        .flash { animation: flash-bg 0.3s; }
+        @keyframes flash-bg { 0% { background-color: #444; } 50% { background-color: #ff0054; } 100% { background-color: #222; } }
     </style>
 </head>
 <body>
 
-    <h1>🪘 Punjabi Tambola 💃</h1>
+    <div class="header">🕺 RHYMING TAMBOLA 💃</div>
 
-    <div id="current-container">
-        <div id="number-display">--</div>
-        <div id="punjabi-text">Ready to play?</div>
+    <div id="display-box">
+        <span id="num">--</span>
+        <div id="rhyme">Press the button to start the party!</div>
     </div>
 
     <div class="controls">
-        <button id="draw-btn" onclick="drawNumber()">Next Number (Agla Number)</button>
-        <button onclick="resetGame()" style="background:#666; margin-left:10px;">Reset</button>
+        <button class="next-btn" onclick="draw()">Agla Number!</button>
+        <button onclick="location.reload()" style="background:#555; color:white;">Reset</button>
     </div>
 
-    <div id="board"></div>
-    
-    <div id="last-called">Previous: <span id="history">-</span></div>
+    <div id="grid"></div>
 
     <script>
-        const punjabiCalls = {
-            1: "Kalla Kehra - Ekka!", 2: "Duggi - Balle Balle!", 3: "Tiggi - Fan Gwandian di!", 4: "Chauka - Boundary!", 5: "Panja - Thappar!", 
-            6: "Chikka - Sixer!", 7: "Satta - Lucky No.!", 8: "Attha - Thath!", 9: "Nahla - Dehla!", 10: "Das - Bas Ji Bas!",
-            11: "Dono Kunware - 11", 12: "Barah - Masala!", 13: "Tera-Mera Saath", 14: "Chaudhvin ka Chand", 15: "Pandran - Chhutti!",
-            16: "Sweet 16 - Munda Shokeen", 17: "Khatra - 17", 18: "Attaran - Ho gaye jawan", 19: "Unni-Bees da farak", 20: "Bees - Very Nice!",
-            21: "Ikkis - Chhad vi de!", 22: "Do baithak - 22", 23: "Tei - Gal nahi bani", 24: "Chobbis - Roti Te Chutney", 25: "Pachis - Kitthe Challi Hain?",
-            26: "Chabbis - Chabi kho gayi", 27: "Satais - Sataunda boht hai", 28: "Athais - Kudiye ni tere..", 29: "Unattis - Un-lucky?", 30: "Tees - Badi tees uthdi",
-            31: "Ikattis - Party baki hai", 32: "Battis - Dant dikhao", 33: "All the 3s - 33", 34: "Chauntis - Oye hoye", 35: "Paintis - Kaddu katteya",
-            36: "Chattis da ankra", 37: "Saintis - Set hai kam", 38: "Athaintis - Thand boht hai", 39: "Untalis - Khali", 40: "Chali - Pe gayi gaali",
-            41: "Iktalis - Number ek", 42: "Batalis - Badi pyaari", 43: "Tatalis - Tenu ki?", 44: "Chaurasi - Chor!", 45: "Pentalis - Panj de piche",
-            46: "Chiyalis - Cha peelo", 47: "Santalis - Desh azad", 48: "Athalis - Thalle behja", 49: "Unanja - Shingar", 50: "Golden Jubilee - 50!",
-            51: "Ikawan - Shagan da", 52: "Bawan - Patte (Cards)", 53: "Tirpan - Tar jao", 54: "Chauwan - Chawan de naal", 55: "Dono Panje - 55",
-            56: "Chhappan Chhuri", 57: "Stawan - Sat shri akal", 58: "Atthawan - Atth!", 59: "Unat - Unat ho gaya", 60: "Satth - Budha thalle",
-            61: "Iksath - Ik hoke raho", 62: "Basath - Bas kar!", 63: "Tirsath - Titar", 64: "Chausath - Chau-chau", 65: "Painsath - Paisa hi paisa",
-            66: "Chhiyath - Double chikka", 67: "Sarsath - Sarr gaya!", 68: "Atthsath - Attho-atth", 69: "Unattar - Ulta-pulta", 70: "Sattar - Bandey katar",
-            71: "Ikattar - Ek hi kafi", 72: "Bahattar - Balle oye", 73: "Tihattar - Teer wargi", 74: "Chauhattar - Cha peeo", 75: "Pachhattar - Piche mudo",
-            76: "Chhihattar - Shabaash", 77: "Two Hockey Sticks - 77", 78: "Atthattar - Attha", 79: "Unasi - Hansi mazaak", 80: "Assi - Assi tussi",
-            81: "Ikasi - Ikka!", 82: "Byasi - Balle!", 83: "Tirasi - Teri meri jodi", 84: "Chaurasi - Gedi", 85: "Panchasi - Nacho!",
-            86: "Chhiasi - Chhikk", 87: "Stasi - Satte pe satta", 88: "Dono Atthe - Fatthe chak!", 89: "Unanve - Bas khatam!", 90: "Nabbe - Top of the House!"
+        // Rhyming Dictionary: English Number + Rhyming Phrase
+        const rhymes = {
+            1: "Number One... Fun hi Fun!",
+            2: "Number Two... I love you!",
+            3: "Number Three... Bajao Seeti!",
+            4: "Number Four... Machao Shor!",
+            5: "Number Five... High Five!",
+            6: "Number Six... Sab kuch Mix!",
+            7: "Number Seven... Swarag (Heaven)!",
+            8: "Number Eight... Don't be late!",
+            9: "Number Nine... You are mine!",
+            10: "Number Ten... Check your pen!",
+            11: "Number Eleven... Phir se Seven!",
+            12: "Number Twelve... Keep it yourself!",
+            13: "Number Thirteen... Soniye Haseen!",
+            14: "Number Fourteen... Rang Rangeen!",
+            15: "Number Fifteen... Kachha Paneer!",
+            16: "Number Sixteen... Munda Shokeen!",
+            17: "Number Seventeen... Khatre di bean!",
+            18: "Number Eighteen... Umarr haseen!",
+            19: "Number Nineteen... Kha lo namkeen!",
+            20: "Number Twenty... Khushiyan Plenty!",
+            21: "Number Twenty One... Shagan da fun!",
+            22: "Number Twenty Two... Kivein ho tussi too?",
+            23: "Number Twenty Three... Chah (Tea) is free!",
+            24: "Number Twenty Four... Dil mange more!",
+            25: "Number Twenty Five... Disco Drive!",
+            26: "Number Twenty Six... Karo number fix!",
+            27: "Number Twenty Seven... Gaddi chale heaven!",
+            28: "Number Twenty Eight... Dekho meri wait!",
+            29: "Number Twenty Nine... Drink your wine!",
+            30: "Number Thirty... Hands are dirty!",
+            31: "Number Thirty One... Get it done!",
+            32: "Number Thirty Two... Dant dikhao moo!",
+            33: "Number Thirty Three... All are free!",
+            34: "Number Thirty Four... Khulle dore!",
+            35: "Number Thirty Five... Bee in a hive!",
+            36: "Number Thirty Six... Chattis da ankra fix!",
+            37: "Number Thirty Seven... Roti in the oven!",
+            38: "Number Thirty Eight... Soniye ni great!",
+            39: "Number Thirty Nine... Line pe line!",
+            40: "Number Forty... Uncle is naughty!",
+            41: "Number Forty One... Life is fun!",
+            42: "Number Forty Two... What can I do?",
+            43: "Number Forty Three... Under the tree!",
+            44: "Number Forty Four... Chor chor chor!",
+            45: "Number Forty Five... Stay alive!",
+            46: "Number Forty Six... Sixer and kicks!",
+            47: "Number Forty Seven... Azad in heaven!",
+            48: "Number Forty Eight... Thalle behja mate!",
+            49: "Number Forty Nine... You look fine!",
+            50: "Number Fifty... Pachaas te nifty!",
+            51: "Number Fifty One... Shagan is done!",
+            52: "Number Fifty Two... Cards in the zoo!",
+            53: "Number Fifty Three... Teree meri free!",
+            54: "Number Fifty Four... Nacho on the floor!",
+            55: "Number Fifty Five... Dono panje alive!",
+            56: "Number Fifty Six... Chhappan chhuri fix!",
+            57: "Number Fifty Seven... Balle-Balle heaven!",
+            58: "Number Fifty Eight... Khulle gate!",
+            59: "Number Fifty Nine... Time to shine!",
+            60: "Number Sixty... Budha is risky!",
+            61: "Number Sixty One... Khedo hun!",
+            62: "Number Sixty Two... Kar lo do-do!",
+            63: "Number Sixty Three... Titar in the tree!",
+            64: "Number Sixty Four... Chawan da shor!",
+            65: "Number Sixty Five... Old age vibe!",
+            66: "Number Sixty Six... Double chikka mix!",
+            67: "Number Sixty Seven... Sarr gaya lemon!",
+            68: "Number Sixty Eight... Moti is great!",
+            69: "Number Sixty Nine... Pulta-pulta line!",
+            70: "Number Seventy... Lucky plenty!",
+            71: "Number Seventy One... Bas kar hun!",
+            72: "Number Seventy Two... Bahattar te bahu!",
+            73: "Number Seventy Three... Soniye free!",
+            74: "Number Seventy Four... Hor hor hor!",
+            75: "Number Seventy Five... Jatt di drive!",
+            76: "Number Seventy Six... Kal di fix!",
+            77: "Number Seventy Seven... Hockey sticks from heaven!",
+            78: "Number Seventy Eight... Gate te wait!",
+            79: "Number Seventy Nine... Smile and shine!",
+            80: "Number Eighty... Chachi is weighty!",
+            81: "Number Eighty One... One more fun!",
+            82: "Number Eighty Two... Balle balle you!",
+            83: "Number Eighty Three... Teri meri free!",
+            84: "Number Eighty Four... Gedi on the floor!",
+            85: "Number Eighty Five... Jive te jive!",
+            86: "Number Eighty Six... Sixer da mix!",
+            87: "Number Eighty Seven... Satte pe heaven!",
+            88: "Number Eighty Eight... Fatthe chak great!",
+            89: "Number Eighty Nine... Last line!",
+            90: "Number Ninety... Top of the house plenty!"
         };
 
-        let numbers = Array.from({length: 90}, (_, i) => i + 1);
-        let calledNumbers = [];
+        let pool = Array.from({length: 90}, (_, i) => i + 1);
 
-        function initBoard() {
-            const board = document.getElementById('board');
-            board.innerHTML = '';
-            for (let i = 1; i <= 90; i++) {
-                const cell = document.createElement('div');
-                cell.className = 'cell';
-                cell.id = 'cell-' + i;
-                cell.innerText = i;
-                board.appendChild(cell);
-            }
+        // Generate Grid
+        const grid = document.getElementById('grid');
+        for(let i=1; i<=90; i++) {
+            let div = document.createElement('div');
+            div.className = 'cell';
+            div.id = 'c' + i;
+            div.innerText = i;
+            grid.appendChild(div);
         }
 
-        function drawNumber() {
-            if (numbers.length === 0) {
-                alert("Game Over! Sare number nikal gaye.");
-                return;
-            }
+        function draw() {
+            if(pool.length === 0) return alert("Game Over!");
 
-            const randomIndex = Math.floor(Math.random() * numbers.length);
-            const num = numbers.splice(randomIndex, 1)[0];
-            calledNumbers.push(num);
+            document.body.classList.add('flash');
+            setTimeout(() => document.body.classList.remove('flash'), 300);
 
-            // Update UI
-            document.getElementById('number-display').innerText = num;
-            document.getElementById('punjabi-text').innerText = punjabiCalls[num] || "";
-            document.getElementById('cell-' + num).classList.add('called');
-            document.getElementById('history').innerText = calledNumbers.slice(-5).reverse().join(', ');
+            let randIdx = Math.floor(Math.random() * pool.length);
+            let n = pool.splice(randIdx, 1)[0];
 
-            // Speak the number (Optional Browser Voice)
-            speakNumber(num);
+            document.getElementById('num').innerText = n;
+            document.getElementById('rhyme').innerText = rhymes[n];
+            document.getElementById('c'+n).classList.add('active');
+
+            speak(rhymes[n]);
         }
 
-        function speakNumber(n) {
-            const msg = new SpeechSynthesisUtterance();
-            msg.text = n + ". " + punjabiCalls[n];
-            msg.lang = 'hi-IN'; // Using Hindi engine for better Punjabi phonetic flow
-            window.speechSynthesis.speak(msg);
+        function speak(t) {
+            window.speechSynthesis.cancel();
+            let m = new SpeechSynthesisUtterance(t);
+            m.rate = 0.85;
+            window.speechSynthesis.speak(m);
         }
-
-        function resetGame() {
-            if(confirm("New game shuru karni hai?")) {
-                numbers = Array.from({length: 90}, (_, i) => i + 1);
-                calledNumbers = [];
-                document.getElementById('number-display').innerText = "--";
-                document.getElementById('punjabi-text').innerText = "Ready to play?";
-                document.getElementById('history').innerText = "-";
-                initBoard();
-            }
-        }
-
-        initBoard();
     </script>
 </body>
 </html>
