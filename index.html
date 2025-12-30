@@ -100,41 +100,17 @@
         .next-btn { background: var(--neon); color: black; box-shadow: 0 4px 0 #28b80d; }
         .reset-btn { background: #444; color: white; font-size: 12px; padding: 8px 15px; }
 
-        /* --- PORTRAIT MODE STYLES --- */
+        /* PORTRAIT MODE STYLES */
         @media (orientation: portrait) {
-            .main-container {
-                flex-direction: column;
-                gap: 5px;
-            }
-
-            .caller-section {
-                order: 1; /* TOP */
-                flex: 0.6; /* Reduced size */
-                min-height: 15dvh;
-            }
+            .main-container { flex-direction: column; gap: 5px; }
+            .caller-section { order: 1; flex: 0.6; min-height: 15dvh; }
             #num { font-size: 18vw; }
             #rhyme { font-size: 14px; margin-top: 2px; }
-
-            .grid-section {
-                order: 2; /* MIDDLE */
-                flex: 2.2; /* Takes most space */
-                padding: 8px;
-            }
+            .grid-section { order: 2; flex: 2.2; padding: 8px; }
             .cell { font-size: 3.2vw; }
-
-            .history-section {
-                order: 3; /* BOTTOM */
-                flex: 0.4;
-                border-left: none;
-                border-top: 3px solid var(--pink);
-                min-height: 8dvh;
-            }
+            .history-section { order: 3; flex: 0.4; border-left: none; border-top: 3px solid var(--pink); min-height: 8dvh; }
             .history-title { font-size: 9px; margin-bottom: 2px; }
-            #history-list {
-                flex-direction: row;
-                justify-content: center;
-                gap: 8px;
-            }
+            #history-list { flex-direction: row; justify-content: center; gap: 8px; }
             .history-item { width: 15%; font-size: 14px; padding: 2px 0; }
             .history-item:first-child { font-size: 18px; }
         }
@@ -165,6 +141,7 @@
     </div>
 
     <div class="footer">
+        <audio id="tts-audio"></audio>
         <button class="next-btn" onclick="draw()">Next Number!</button>
         <button class="reset-btn" onclick="location.reload()">Reset</button>
     </div>
@@ -172,10 +149,10 @@
     <script>
         const rhymes = {
             1: "Number One... Fun hi Fun!", 2: "Number Two... I love you!", 3: "Number Three... Bajao Seeti!", 4: "Number Four... Machao Shor!", 5: "Number Five... High Five!", 
-            6: "Number Six... Sab kuch Mix!", 7: "Number Seven... Swarag (Heaven)!", 8: "Number Eight... Don't be late!", 9: "Number Nine... You are mine!", 10: "Number Ten... Check your pen!",
+            6: "Number Six... Sab kuch Mix!", 7: "Number Seven... Swarag!", 8: "Number Eight... Don't be late!", 9: "Number Nine... You are mine!", 10: "Number Ten... Check your pen!",
             11: "Number Eleven... Phir se Seven!", 12: "Number Twelve... Keep it yourself!", 13: "Number Thirteen... Soniye Haseen!", 14: "Number Fourteen... Rang Rangeen!", 15: "Number Fifteen... Kachha Paneer!",
             16: "Number Sixteen... Munda Shokeen!", 17: "Number Seventeen... Khatre di bean!", 18: "Number Eighteen... Umarr haseen!", 19: "Number Nineteen... Kha lo namkeen!", 20: "Number Twenty... Khushiyan Plenty!",
-            21: "Number Twenty One... Shagan da fun!", 22: "Number Twenty Two... Do Baithak You!", 23: "Number Twenty Three... Chah (Tea) is free!", 24: "Number Twenty Four... Dil mange more!", 25: "Number Twenty Five... Disco Drive!",
+            21: "Number Twenty One... Shagan da fun!", 22: "Number Twenty Two... Do Baithak You!", 23: "Number Twenty Three... Chah is free!", 24: "Number Twenty Four... Dil mange more!", 25: "Number Twenty Five... Disco Drive!",
             26: "Number Twenty Six... Karo number fix!", 27: "Number Twenty Seven... Gaddi chale heaven!", 28: "Number Twenty Eight... Dekho meri wait!", 29: "Number Twenty Nine... Line pe line!", 30: "Number Thirty... Hands are dirty!",
             31: "Number Thirty One... Get it done!", 32: "Number Thirty Two... Dant dikhao moo!", 33: "Number Thirty Three... All are free!", 34: "Number Thirty Four... Khulle dore!", 35: "Number Thirty Five... Bee in a hive!",
             36: "Number Thirty Six... Chattis da ankra fix!", 37: "Number Thirty Seven... Roti in the oven!", 38: "Number Thirty Eight... Soniye ni great!", 39: "Number Thirty Nine... Line pe line!", 40: "Number Forty... Uncle is naughty!",
@@ -186,7 +163,7 @@
             61: "Number Sixty One... Khedo hun!", 62: "Number Sixty Two... Kar lo do-do!", 63: "Number Sixty Three... Titar in the tree!", 64: "Number Sixty Four... Chawan da shor!", 65: "Number Sixty Five... Old age vibe!",
             66: "Number Sixty Six... Double chikka mix!", 67: "Number Sixty Seven... Sarr gaya lemon!", 68: "Number Sixty Eight... Moti is great!", 69: "Number Sixty Nine... Pulta-pulta line!", 70: "Number Seventy... Lucky plenty!",
             71: "Number Seventy One... Bas kar hun!", 72: "Number Seventy Two... Bahattar te bahu!", 73: "Number Seventy Three... Soniye free!", 74: "Number Seventy Four... Hor hor hor!", 75: "Number Seventy Five... Jatt di drive!",
-            76: "Number Seventy Six... Kal di fix!", 77: "Number Seventy Seven... Hockey sticks from heaven!", 78: "Number Seventy Eight... Gate te wait!", 79: "Number Seventy Nine... Smile and shine!", 80: "Number Eighty... Chachi is weighty!",
+            76: "Number Seventy Six... Kal di fix!", 77: "Number Seventy Seven... Hockey sticks!", 78: "Number Seventy Eight... Gate te wait!", 79: "Number Seventy Nine... Smile and shine!", 80: "Number Eighty... Chachi is weighty!",
             81: "Number Eighty One... One more fun!", 82: "Number Eighty Two... Balle balle you!", 83: "Number Eighty Three... Teri meri jodi!", 84: "Number Eighty Four... Gedi on the floor!", 85: "Number Eighty Five... Jive te jive!",
             86: "Number Eighty Six... Sixer da mix!", 87: "Number Eighty Seven... Satte pe heaven!", 88: "Number Eighty Eight... Fatthe chak great!", 89: "Number Eighty Nine... Last line!", 90: "Number Ninety... Top of the house plenty!"
         };
@@ -196,6 +173,7 @@
 
         function init() {
             const grid = document.getElementById('grid');
+            grid.innerHTML = '';
             for(let i=1; i<=90; i++) {
                 let div = document.createElement('div');
                 div.className = 'cell';
@@ -230,11 +208,17 @@
             }
         }
 
-        function speak(t) {
-            window.speechSynthesis.cancel();
-            let m = new SpeechSynthesisUtterance(t);
-            m.rate = 0.9;
-            window.speechSynthesis.speak(m);
+        function speak(text) {
+            const audio = document.getElementById('tts-audio');
+            // Encode the text for the URL
+            const encodedText = encodeURIComponent(text);
+            // Use Google Translate's TTS API (client=tw-ob bypasses modern restriction tokens)
+            const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodedText}&tl=en-IN&client=tw-ob`;
+            
+            audio.src = ttsUrl;
+            audio.play().catch(e => {
+                console.log("Playback failed. This usually requires a user interaction first.", e);
+            });
         }
 
         init();
