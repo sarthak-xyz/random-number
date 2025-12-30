@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Punjabi Tambola Fun</title>
+    <style>
+        :root {
+            --primary: #d32f2f;
+            --secondary: #ffc107;
+            --bg: #fff9e6;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 { color: var(--primary); text-shadow: 1px 1px 2px #ccc; }
+        
+        #current-container {
+            background: white;
+            border: 5px solid var(--secondary);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            width: 90%;
+            max-width: 500px;
+        }
+        #number-display {
+            font-size: 80px;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 0;
+        }
+        #punjabi-text {
+            font-size: 24px;
+            color: #555;
+            font-style: italic;
+            min-height: 1.5em;
+        }
+
+        .controls { margin-bottom: 20px; }
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            border: none;
+            border-radius: 10px;
+            background: var(--primary);
+            color: white;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        button:hover { background: #b71c1c; transform: scale(1.05); }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+
+        #board {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 5px;
+            max-width: 600px;
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .cell {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #aaa;
+        }
+        .cell.called {
+            background-color: var(--secondary);
+            color: black;
+            font-weight: bold;
+            border-color: var(--secondary);
+        }
+        
+        #last-called {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🪘 Punjabi Tambola 💃</h1>
+
+    <div id="current-container">
+        <div id="number-display">--</div>
+        <div id="punjabi-text">Ready to play?</div>
+    </div>
+
+    <div class="controls">
+        <button id="draw-btn" onclick="drawNumber()">Next Number (Agla Number)</button>
+        <button onclick="resetGame()" style="background:#666; margin-left:10px;">Reset</button>
+    </div>
+
+    <div id="board"></div>
+    
+    <div id="last-called">Previous: <span id="history">-</span></div>
+
+    <script>
+        const punjabiCalls = {
+            1: "Kalla Kehra - Ekka!", 2: "Duggi - Balle Balle!", 3: "Tiggi - Fan Gwandian di!", 4: "Chauka - Boundary!", 5: "Panja - Thappar!", 
+            6: "Chikka - Sixer!", 7: "Satta - Lucky No.!", 8: "Attha - Thath!", 9: "Nahla - Dehla!", 10: "Das - Bas Ji Bas!",
+            11: "Dono Kunware - 11", 12: "Barah - Masala!", 13: "Tera-Mera Saath", 14: "Chaudhvin ka Chand", 15: "Pandran - Chhutti!",
+            16: "Sweet 16 - Munda Shokeen", 17: "Khatra - 17", 18: "Attaran - Ho gaye jawan", 19: "Unni-Bees da farak", 20: "Bees - Very Nice!",
+            21: "Ikkis - Chhad vi de!", 22: "Do baithak - 22", 23: "Tei - Gal nahi bani", 24: "Chobbis - Roti Te Chutney", 25: "Pachis - Kitthe Challi Hain?",
+            26: "Chabbis - Chabi kho gayi", 27: "Satais - Sataunda boht hai", 28: "Athais - Kudiye ni tere..", 29: "Unattis - Un-lucky?", 30: "Tees - Badi tees uthdi",
+            31: "Ikattis - Party baki hai", 32: "Battis - Dant dikhao", 33: "All the 3s - 33", 34: "Chauntis - Oye hoye", 35: "Paintis - Kaddu katteya",
+            36: "Chattis da ankra", 37: "Saintis - Set hai kam", 38: "Athaintis - Thand boht hai", 39: "Untalis - Khali", 40: "Chali - Pe gayi gaali",
+            41: "Iktalis - Number ek", 42: "Batalis - Badi pyaari", 43: "Tatalis - Tenu ki?", 44: "Chaurasi - Chor!", 45: "Pentalis - Panj de piche",
+            46: "Chiyalis - Cha peelo", 47: "Santalis - Desh azad", 48: "Athalis - Thalle behja", 49: "Unanja - Shingar", 50: "Golden Jubilee - 50!",
+            51: "Ikawan - Shagan da", 52: "Bawan - Patte (Cards)", 53: "Tirpan - Tar jao", 54: "Chauwan - Chawan de naal", 55: "Dono Panje - 55",
+            56: "Chhappan Chhuri", 57: "Stawan - Sat shri akal", 58: "Atthawan - Atth!", 59: "Unat - Unat ho gaya", 60: "Satth - Budha thalle",
+            61: "Iksath - Ik hoke raho", 62: "Basath - Bas kar!", 63: "Tirsath - Titar", 64: "Chausath - Chau-chau", 65: "Painsath - Paisa hi paisa",
+            66: "Chhiyath - Double chikka", 67: "Sarsath - Sarr gaya!", 68: "Atthsath - Attho-atth", 69: "Unattar - Ulta-pulta", 70: "Sattar - Bandey katar",
+            71: "Ikattar - Ek hi kafi", 72: "Bahattar - Balle oye", 73: "Tihattar - Teer wargi", 74: "Chauhattar - Cha peeo", 75: "Pachhattar - Piche mudo",
+            76: "Chhihattar - Shabaash", 77: "Two Hockey Sticks - 77", 78: "Atthattar - Attha", 79: "Unasi - Hansi mazaak", 80: "Assi - Assi tussi",
+            81: "Ikasi - Ikka!", 82: "Byasi - Balle!", 83: "Tirasi - Teri meri jodi", 84: "Chaurasi - Gedi", 85: "Panchasi - Nacho!",
+            86: "Chhiasi - Chhikk", 87: "Stasi - Satte pe satta", 88: "Dono Atthe - Fatthe chak!", 89: "Unanve - Bas khatam!", 90: "Nabbe - Top of the House!"
+        };
+
+        let numbers = Array.from({length: 90}, (_, i) => i + 1);
+        let calledNumbers = [];
+
+        function initBoard() {
+            const board = document.getElementById('board');
+            board.innerHTML = '';
+            for (let i = 1; i <= 90; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.id = 'cell-' + i;
+                cell.innerText = i;
+                board.appendChild(cell);
+            }
+        }
+
+        function drawNumber() {
+            if (numbers.length === 0) {
+                alert("Game Over! Sare number nikal gaye.");
+                return;
+            }
+
+            const randomIndex = Math.floor(Math.random() * numbers.length);
+            const num = numbers.splice(randomIndex, 1)[0];
+            calledNumbers.push(num);
+
+            // Update UI
+            document.getElementById('number-display').innerText = num;
+            document.getElementById('punjabi-text').innerText = punjabiCalls[num] || "";
+            document.getElementById('cell-' + num).classList.add('called');
+            document.getElementById('history').innerText = calledNumbers.slice(-5).reverse().join(', ');
+
+            // Speak the number (Optional Browser Voice)
+            speakNumber(num);
+        }
+
+        function speakNumber(n) {
+            const msg = new SpeechSynthesisUtterance();
+            msg.text = n + ". " + punjabiCalls[n];
+            msg.lang = 'hi-IN'; // Using Hindi engine for better Punjabi phonetic flow
+            window.speechSynthesis.speak(msg);
+        }
+
+        function resetGame() {
+            if(confirm("New game shuru karni hai?")) {
+                numbers = Array.from({length: 90}, (_, i) => i + 1);
+                calledNumbers = [];
+                document.getElementById('number-display').innerText = "--";
+                document.getElementById('punjabi-text').innerText = "Ready to play?";
+                document.getElementById('history').innerText = "-";
+                initBoard();
+            }
+        }
+
+        initBoard();
+    </script>
+</body>
+</html>
