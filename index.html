@@ -96,22 +96,45 @@
             gap: 15px; 
             padding: 5px;
         }
-        button { padding: 10px 25px; font-size: 18px; font-weight: bold; border-radius: 50px; border: none; cursor: pointer; transition: transform 0.1s; }
-        button:active { transform: scale(0.95); }
+        button { padding: 10px 25px; font-size: 18px; font-weight: bold; border-radius: 50px; border: none; cursor: pointer; }
         .next-btn { background: var(--neon); color: black; box-shadow: 0 4px 0 #28b80d; }
         .reset-btn { background: #444; color: white; font-size: 12px; padding: 8px 15px; }
 
-        /* Portrait Mode Styles */
+        /* --- PORTRAIT MODE STYLES --- */
         @media (orientation: portrait) {
-            .main-container { flex-direction: column; gap: 5px; }
-            .caller-section { order: 1; flex: 0.6; min-height: 15dvh; }
+            .main-container {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .caller-section {
+                order: 1; /* TOP */
+                flex: 0.6; /* Reduced size */
+                min-height: 15dvh;
+            }
             #num { font-size: 18vw; }
             #rhyme { font-size: 14px; margin-top: 2px; }
-            .grid-section { order: 2; flex: 2.2; padding: 8px; }
+
+            .grid-section {
+                order: 2; /* MIDDLE */
+                flex: 2.2; /* Takes most space */
+                padding: 8px;
+            }
             .cell { font-size: 3.2vw; }
-            .history-section { order: 3; flex: 0.4; border-left: none; border-top: 3px solid var(--pink); min-height: 8dvh; }
+
+            .history-section {
+                order: 3; /* BOTTOM */
+                flex: 0.4;
+                border-left: none;
+                border-top: 3px solid var(--pink);
+                min-height: 8dvh;
+            }
             .history-title { font-size: 9px; margin-bottom: 2px; }
-            #history-list { flex-direction: row; justify-content: center; gap: 8px; }
+            #history-list {
+                flex-direction: row;
+                justify-content: center;
+                gap: 8px;
+            }
             .history-item { width: 15%; font-size: 14px; padding: 2px 0; }
             .history-item:first-child { font-size: 18px; }
         }
@@ -143,7 +166,7 @@
 
     <div class="footer">
         <button class="next-btn" onclick="draw()">Next Number!</button>
-        <button class="reset-btn" onclick="handleReset()">Reset</button>
+        <button class="reset-btn" onclick="location.reload()">Reset</button>
     </div>
 
     <script>
@@ -171,12 +194,8 @@
         let pool = Array.from({length: 90}, (_, i) => i + 1);
         let historyArr = [];
 
-        // Pre-initialize Speech Synthesis for Android
-        window.speechSynthesis.getVoices();
-
         function init() {
             const grid = document.getElementById('grid');
-            grid.innerHTML = '';
             for(let i=1; i<=90; i++) {
                 let div = document.createElement('div');
                 div.className = 'cell';
@@ -188,7 +207,6 @@
 
         function draw() {
             if(pool.length === 0) return alert("Game Over!");
-            
             let randIdx = Math.floor(Math.random() * pool.length);
             let n = pool.splice(randIdx, 1)[0];
             
@@ -212,25 +230,11 @@
             }
         }
 
-        function speak(text) {
-            // Android TV Fix: Cancel previous speech first
+        function speak(t) {
             window.speechSynthesis.cancel();
-
-            // Small delay before speaking ensures the speech engine resets properly on Android WebView
-            setTimeout(() => {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.rate = 0.85; 
-                utterance.pitch = 1;
-                utterance.lang = 'en-IN'; // Uses Indian English accent if available
-                
-                window.speechSynthesis.speak(utterance);
-            }, 50);
-        }
-
-        function handleReset() {
-            if(confirm("Start a new game?")) {
-                location.reload();
-            }
+            let m = new SpeechSynthesisUtterance(t);
+            m.rate = 0.9;
+            window.speechSynthesis.speak(m);
         }
 
         init();
