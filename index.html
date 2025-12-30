@@ -2,10 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, orientation=landscape">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Rhyming Punjabi Tambola</title>
     <style>
         :root { --neon: #39ff14; --pink: #ff0054; --bg: #121212; --panel: #1e1e1e; }
+        
+        * { box-sizing: border-box; }
+
         body { 
             font-family: 'Arial Black', sans-serif; 
             background-color: var(--bg); 
@@ -15,21 +18,31 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
+            height: 100dvh;
             overflow: hidden;
         }
 
-        .header { height: 8%; text-align: center; color: var(--pink); font-size: 22px; padding-top: 5px; letter-spacing: 2px; }
+        .header { 
+            height: 5dvh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--pink); 
+            font-size: 18px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
 
-        /* Three Column Layout */
         .main-container {
             display: flex;
             flex-direction: row;
-            height: 77%;
+            flex: 1;
             gap: 10px;
-            padding: 0 15px;
+            padding: 0 10px;
+            min-height: 0;
         }
 
-        /* 1. History Sidebar (Left) */
+        /* 1. History Section */
         .history-section {
             flex: 0.5;
             background: var(--panel);
@@ -37,15 +50,15 @@
             border-left: 4px solid var(--pink);
             display: flex;
             flex-direction: column;
-            padding: 10px;
-            overflow: hidden;
+            padding: 8px;
+            min-height: 0;
         }
-        .history-title { font-size: 14px; color: #888; text-align: center; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
-        #history-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; align-items: center; }
-        .history-item { font-size: 20px; color: #aaa; background: #2a2a2a; width: 80%; text-align: center; padding: 5px; border-radius: 8px; transition: 0.3s; }
-        .history-item:first-child { color: var(--neon); font-size: 28px; border: 1px solid var(--neon); background: #1a331a; }
+        .history-title { font-size: 10px; color: #888; text-align: center; margin-bottom: 5px; border-bottom: 1px solid #333; }
+        #history-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 5px; align-items: center; flex: 1; justify-content: space-around; }
+        .history-item { font-size: 18px; color: #aaa; background: #2a2a2a; width: 90%; text-align: center; padding: 4px; border-radius: 6px; }
+        .history-item:first-child { color: var(--neon); font-size: 24px; border: 1px solid var(--neon); background: #1a331a; }
 
-        /* 2. Caller Display (Center) */
+        /* 2. Caller Display */
         .caller-section {
             flex: 1.2;
             display: flex;
@@ -57,37 +70,83 @@
             border: 4px solid var(--pink);
             padding: 10px;
         }
-        #num { font-size: 15vw; line-height: 1; color: var(--neon); text-shadow: 0 0 20px rgba(57, 255, 20, 0.4); }
-        #rhyme { font-size: 2vw; color: white; margin-top: 5px; text-align: center; font-weight: normal; font-family: 'Segoe UI', sans-serif; }
+        #num { font-size: 10vw; line-height: 1; color: var(--neon); text-shadow: 0 0 15px rgba(57, 255, 20, 0.4); }
+        #rhyme { font-size: 1.5vw; color: white; margin-top: 5px; text-align: center; font-family: 'Segoe UI', sans-serif; }
 
-        /* 3. Grid Section (Right) */
+        /* 3. Grid Section */
         .grid-section {
-            flex: 1.3;
+            flex: 1.8;
             display: grid;
             grid-template-columns: repeat(10, 1fr);
-            gap: 4px;
+            gap: 3px;
             background: var(--panel);
             padding: 10px;
             border-radius: 15px;
+            min-height: 0;
         }
-        .cell { background: #333; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 1.2vw; color: #555; }
+        .cell { background: #333; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 1.1vw; color: #555; }
         .cell.active { background: var(--pink); color: white; font-weight: bold; }
 
         /* Controls Footer */
-        .footer { height: 15%; display: flex; justify-content: center; align-items: center; gap: 30px; }
-        button { padding: 12px 40px; font-size: 22px; font-weight: bold; border-radius: 50px; border: none; cursor: pointer; text-transform: uppercase; }
-        .next-btn { background: var(--neon); color: black; box-shadow: 0 6px 0 #28b80d; }
-        .next-btn:active { transform: translateY(4px); box-shadow: none; }
-        .reset-btn { background: #444; color: white; font-size: 14px; padding: 10px 20px; }
+        .footer { 
+            height: 10dvh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 15px; 
+            padding: 5px;
+        }
+        button { padding: 10px 25px; font-size: 18px; font-weight: bold; border-radius: 50px; border: none; cursor: pointer; }
+        .next-btn { background: var(--neon); color: black; box-shadow: 0 4px 0 #28b80d; }
+        .reset-btn { background: #444; color: white; font-size: 12px; padding: 8px 15px; }
+
+        /* --- PORTRAIT MODE STYLES --- */
+        @media (orientation: portrait) {
+            .main-container {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .caller-section {
+                order: 1; /* TOP */
+                flex: 0.6; /* Reduced size */
+                min-height: 15dvh;
+            }
+            #num { font-size: 18vw; }
+            #rhyme { font-size: 14px; margin-top: 2px; }
+
+            .grid-section {
+                order: 2; /* MIDDLE */
+                flex: 2.2; /* Takes most space */
+                padding: 8px;
+            }
+            .cell { font-size: 3.2vw; }
+
+            .history-section {
+                order: 3; /* BOTTOM */
+                flex: 0.4;
+                border-left: none;
+                border-top: 3px solid var(--pink);
+                min-height: 8dvh;
+            }
+            .history-title { font-size: 9px; margin-bottom: 2px; }
+            #history-list {
+                flex-direction: row;
+                justify-content: center;
+                gap: 8px;
+            }
+            .history-item { width: 15%; font-size: 14px; padding: 2px 0; }
+            .history-item:first-child { font-size: 18px; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="header">🕺 PUNJABI TAMBOLA PARTY 💃</div>
+    <div class="header">🕺 PUNJABI TAMBOLA 💃</div>
 
     <div class="main-container">
         <div class="history-section">
-            <div class="history-title">RECENT NUMBERS</div>
+            <div class="history-title">RECENT</div>
             <div id="history-list">
                 <div class="history-item">-</div>
                 <div class="history-item">-</div>
@@ -99,14 +158,14 @@
 
         <div class="caller-section">
             <span id="num">--</span>
-            <div id="rhyme">Press Agla Number!</div>
+            <div id="rhyme">Next Number!</div>
         </div>
 
         <div id="grid" class="grid-section"></div>
     </div>
 
     <div class="footer">
-        <button class="next-btn" onclick="draw()">Agla Number!</button>
+        <button class="next-btn" onclick="draw()">Next Number!</button>
         <button class="reset-btn" onclick="location.reload()">Reset</button>
     </div>
 
@@ -151,20 +210,16 @@
             let randIdx = Math.floor(Math.random() * pool.length);
             let n = pool.splice(randIdx, 1)[0];
             
-            historyArr.unshift(n); // Add to start of array
+            historyArr.unshift(n);
             updateUI(n);
             speak(rhymes[n]);
         }
 
         function updateUI(n) {
-            // Update Center Display
             document.getElementById('num').innerText = n;
             document.getElementById('rhyme').innerText = rhymes[n];
-            
-            // Update Board
             document.getElementById('c'+n).classList.add('active');
             
-            // Update Sidebar History
             const historyList = document.getElementById('history-list');
             historyList.innerHTML = '';
             for(let i=0; i<5; i++) {
@@ -178,7 +233,7 @@
         function speak(t) {
             window.speechSynthesis.cancel();
             let m = new SpeechSynthesisUtterance(t);
-            m.rate = 0.85;
+            m.rate = 0.9;
             window.speechSynthesis.speak(m);
         }
 
